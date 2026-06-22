@@ -8,6 +8,7 @@ import com.example.seapedia.core.utils.Constants
 import com.example.seapedia.core.utils.Resource
 import com.example.seapedia.data.local.SeaPediaDatabase
 import com.example.seapedia.data.local.UserEntity
+import com.example.seapedia.data.remote.GoogleAuthRequest
 import com.example.seapedia.data.remote.LoginRequest
 import com.example.seapedia.data.remote.RegisterRequest
 import com.example.seapedia.data.remote.SeaPediaApi
@@ -62,6 +63,20 @@ class AuthRepositoryImpl @Inject constructor(
         }
     } catch (e: Exception) {
         Resource.Error(e.message ?: "Register failed")
+    }
+
+    override suspend fun googleSignIn(idToken: String, role: String): Resource<User> = try {
+        val response = api.googleAuth(GoogleAuthRequest(idToken, role))
+        if (response.success && response.data != null) {
+            val user = response.data.toDomain()
+            db.userDao().insertUser(user.toEntity())
+            saveSession(user)
+            Resource.Success(user)
+        } else {
+            Resource.Error(response.message)
+        }
+    } catch (e: Exception) {
+        Resource.Error(e.message ?: "Google Sign-In failed")
     }
 
     override suspend fun logout() {

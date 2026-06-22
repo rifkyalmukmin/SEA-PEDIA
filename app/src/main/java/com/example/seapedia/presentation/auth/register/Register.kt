@@ -28,10 +28,18 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.credentials.CredentialManager
+import androidx.credentials.CustomCredential
+import androidx.credentials.GetCredentialRequest
+import androidx.credentials.exceptions.GetCredentialException
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.seapedia.R
 import com.example.seapedia.core.ui.theme.*
+import com.example.seapedia.core.utils.Constants
+import com.google.android.libraries.identity.googleid.GetGoogleIdOption
+import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
+import kotlinx.coroutines.launch
 
 private data class RoleOption(val value: String, val label: String, val icon: Int)
 
@@ -50,6 +58,8 @@ fun RegisterScreen(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
+    val context = androidx.compose.ui.platform.LocalContext.current
+    val scope = rememberCoroutineScope()
 
     var fullName by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
@@ -58,6 +68,32 @@ fun RegisterScreen(
     var selectedRole by remember { mutableStateOf("") }
 
     val scrollState = rememberScrollState()
+
+    val onGoogleSignUp: () -> Unit = {
+        scope.launch {
+            try {
+                val credentialManager = CredentialManager.create(context)
+                val googleIdOption = GetGoogleIdOption.Builder()
+                    .setFilterByAuthorizedAccounts(false)
+                    .setServerClientId(Constants.WEB_CLIENT_ID)
+                    .setAutoSelectEnabled(false)
+                    .build()
+                val request = GetCredentialRequest.Builder()
+                    .addCredentialOption(googleIdOption)
+                    .build()
+                val result = credentialManager.getCredential(context, request)
+                val credential = result.credential
+                if (credential is CustomCredential &&
+                    credential.type == GoogleIdTokenCredential.TYPE_GOOGLE_ID_TOKEN_CREDENTIAL
+                ) {
+                    val googleCredential = GoogleIdTokenCredential.createFrom(credential.data)
+                    viewModel.googleSignIn(googleCredential.idToken, selectedRole.ifBlank { "buyer" })
+                }
+            } catch (e: GetCredentialException) {
+                snackbarHostState.showSnackbar(e.message ?: "Google Sign-Up gagal")
+            }
+        }
+    }
 
     // Navigasi saat register berhasil
     LaunchedEffect(uiState.navigateToRole) {
@@ -135,7 +171,7 @@ fun RegisterScreen(
 
                             // Google Sign Up
                             OutlinedButton(
-                                onClick = { /* TODO: Google Sign Up */ },
+                                onClick = onGoogleSignUp,
                                 modifier = Modifier.fillMaxWidth(),
                                 shape = RoundedCornerShape(12.dp),
                                 border = BorderStroke(1.dp, OutlineVariant.copy(alpha = 0.5f)),

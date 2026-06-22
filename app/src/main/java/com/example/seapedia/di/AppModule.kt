@@ -1,6 +1,7 @@
 package com.example.seapedia.di
 
 import com.example.seapedia.domain.AuthRepository
+import com.example.seapedia.domain.GoogleSignInUseCase
 import com.example.seapedia.domain.LoginUseCase
 import com.example.seapedia.domain.RegisterUseCase
 import dagger.Module
@@ -22,4 +23,9 @@ object AppModule {
     @Singleton
     fun provideRegisterUseCase(repository: AuthRepository): RegisterUseCase =
         RegisterUseCase(repository)
+
+    @Provides
+    @Singleton
+    fun provideGoogleSignInUseCase(repository: AuthRepository): GoogleSignInUseCase =
+        GoogleSignInUseCase(repository)
 }

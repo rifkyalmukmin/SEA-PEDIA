@@ -11,3 +11,8 @@ data class RegisterRequest(
     val password: String,
     val role: String
 )
+
+data class GoogleAuthRequest(
+    val idToken: String,
+    val role: String = "buyer"
+)

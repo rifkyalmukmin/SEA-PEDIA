@@ -3,6 +3,7 @@ package com.example.seapedia.presentation.auth.login
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.seapedia.core.utils.Resource
+import com.example.seapedia.domain.GoogleSignInUseCase
 import com.example.seapedia.domain.LoginUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -20,7 +21,8 @@ data class LoginUiState(
 
 @HiltViewModel
 class LoginViewModel @Inject constructor(
-    private val loginUseCase: LoginUseCase
+    private val loginUseCase: LoginUseCase,
+    private val googleSignInUseCase: GoogleSignInUseCase
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(LoginUiState())
@@ -53,6 +55,21 @@ class LoginViewModel @Inject constructor(
 
     fun onNavigated() {
         _uiState.update { it.copy(navigateToRole = null) }
+    }
+
+    fun googleSignIn(idToken: String) {
+        viewModelScope.launch {
+            _uiState.update { it.copy(isLoading = true, errorMessage = null) }
+            when (val result = googleSignInUseCase(idToken)) {
+                is Resource.Success -> _uiState.update {
+                    it.copy(isLoading = false, navigateToRole = result.data.role)
+                }
+                is Resource.Error -> _uiState.update {
+                    it.copy(isLoading = false, errorMessage = result.message)
+                }
+                is Resource.Loading -> Unit
+            }
+        }
     }
 
     private fun validate(email: String, password: String): String? {

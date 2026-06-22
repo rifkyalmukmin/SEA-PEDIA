@@ -15,3 +15,8 @@ class RegisterUseCase(private val repository: AuthRepository) {
         role: String
     ): Resource<User> = repository.register(name, email, password, role)
 }
+
+class GoogleSignInUseCase(private val repository: AuthRepository) {
+    suspend operator fun invoke(idToken: String, role: String = "buyer"): Resource<User> =
+        repository.googleSignIn(idToken, role)
+}

@@ -14,6 +14,19 @@ const User = {
     return rows[0] || null;
   },
 
+  async findByGoogleId(googleId) {
+    const { rows } = await db.query('SELECT * FROM users WHERE google_id = $1', [googleId]);
+    return rows[0] || null;
+  },
+
+  async createWithGoogle({ name, email, google_id, avatar_url, role_id }) {
+    const { rows } = await db.query(
+      'INSERT INTO users (name, email, google_id, avatar_url, role_id) VALUES ($1, $2, $3, $4, $5) RETURNING id, name, email, phone, role_id, created_at',
+      [name, email, google_id, avatar_url, role_id]
+    );
+    return rows[0];
+  },
+
   async create({ name, email, password, phone, role_id }) {
     const { rows } = await db.query(
       'INSERT INTO users (name, email, password, phone, role_id) VALUES ($1, $2, $3, $4, $5) RETURNING id, name, email, phone, role_id, created_at',

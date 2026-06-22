@@ -14,4 +14,7 @@ object Constants {
     const val ROLE_SELLER = "seller"
     const val ROLE_DRIVER = "driver"
     const val ROLE_ADMIN = "admin"
+
+    // Google Sign-In — ganti dengan Web Client ID dari Google Cloud Console
+    const val WEB_CLIENT_ID = "YOUR_WEB_CLIENT_ID.apps.googleusercontent.com"
 }

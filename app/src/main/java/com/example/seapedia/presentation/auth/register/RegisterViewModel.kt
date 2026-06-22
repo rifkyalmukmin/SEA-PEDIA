@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.seapedia.core.utils.Constants
 import com.example.seapedia.core.utils.Resource
+import com.example.seapedia.domain.GoogleSignInUseCase
 import com.example.seapedia.domain.RegisterUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -21,7 +22,8 @@ data class RegisterUiState(
 
 @HiltViewModel
 class RegisterViewModel @Inject constructor(
-    private val registerUseCase: RegisterUseCase
+    private val registerUseCase: RegisterUseCase,
+    private val googleSignInUseCase: GoogleSignInUseCase
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(RegisterUiState())
@@ -54,6 +56,26 @@ class RegisterViewModel @Inject constructor(
 
     fun onNavigated() {
         _uiState.update { it.copy(navigateToRole = null) }
+    }
+
+    fun googleSignIn(idToken: String, role: String) {
+        val validRoles = listOf(Constants.ROLE_BUYER, Constants.ROLE_SELLER, Constants.ROLE_DRIVER)
+        if (role !in validRoles) {
+            _uiState.update { it.copy(errorMessage = "Pilih peran akun terlebih dahulu") }
+            return
+        }
+        viewModelScope.launch {
+            _uiState.update { it.copy(isLoading = true, errorMessage = null) }
+            when (val result = googleSignInUseCase(idToken, role)) {
+                is Resource.Success -> _uiState.update {
+                    it.copy(isLoading = false, navigateToRole = result.data.role)
+                }
+                is Resource.Error -> _uiState.update {
+                    it.copy(isLoading = false, errorMessage = result.message)
+                }
+                is Resource.Loading -> Unit
+            }
+        }
     }
 
     private fun validate(name: String, email: String, password: String, role: String): String? {

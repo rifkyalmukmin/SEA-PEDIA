@@ -9,4 +9,7 @@ interface SeaPediaApi {
 
     @POST("auth/register")
     suspend fun register(@Body request: RegisterRequest): AuthResponse
+
+    @POST("auth/google")
+    suspend fun googleAuth(@Body request: GoogleAuthRequest): AuthResponse
 }

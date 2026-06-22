@@ -87,6 +87,11 @@ dependencies {
     // Coil
     implementation(libs.coil.compose)
 
+    // Credential Manager - Google Sign-In
+    implementation(libs.credential.manager)
+    implementation(libs.credential.manager.play.services)
+    implementation(libs.googleid)
+
     // Testing
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
