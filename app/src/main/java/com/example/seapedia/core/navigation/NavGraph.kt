@@ -11,6 +11,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
+import com.example.seapedia.core.utils.Constants
 import com.example.seapedia.presentation.auth.login.LoginScreen
 import com.example.seapedia.presentation.auth.register.RegisterScreen
 import com.example.seapedia.presentation.home.HomeScreen
@@ -44,8 +45,8 @@ fun NavGraph(navController: NavHostController) {
                         navController.navigate(Screen.Register.route)
                     },
                     onNavigateToForgotPassword = { /* TODO */ },
-                    onLoginSuccess = {
-                        navController.navigate(Screen.BUYER_GRAPH) {
+                    onLoginSuccess = { role ->
+                        navController.navigate(roleToGraph(role)) {
                             popUpTo(Screen.AUTH_GRAPH) { inclusive = true }
                         }
                     }
@@ -55,8 +56,8 @@ fun NavGraph(navController: NavHostController) {
             composable(Screen.Register.route) {
                 RegisterScreen(
                     onNavigateToLogin = { navController.popBackStack() },
-                    onRegisterSuccess = {
-                        navController.navigate(Screen.BUYER_GRAPH) {
+                    onRegisterSuccess = { role ->
+                        navController.navigate(roleToGraph(role)) {
                             popUpTo(Screen.AUTH_GRAPH) { inclusive = true }
                         }
                     }
@@ -69,9 +70,7 @@ fun NavGraph(navController: NavHostController) {
             startDestination = Screen.Buyer.Home.route,
             route = Screen.BUYER_GRAPH
         ) {
-            composable(Screen.Buyer.Home.route) {
-                HomeScreen()
-            }
+            composable(Screen.Buyer.Home.route) { HomeScreen() }
             composable(Screen.Buyer.Cart.route) { PlaceholderScreen("Keranjang") }
             composable(Screen.Buyer.Checkout.route) { PlaceholderScreen("Checkout") }
             composable(Screen.Buyer.Order.route) { PlaceholderScreen("Pesanan Saya") }
@@ -115,6 +114,13 @@ fun NavGraph(navController: NavHostController) {
             composable(Screen.Admin.Voucher.route) { PlaceholderScreen("Kelola Voucher") }
         }
     }
+}
+
+private fun roleToGraph(role: String): String = when (role) {
+    Constants.ROLE_SELLER -> Screen.SELLER_GRAPH
+    Constants.ROLE_DRIVER -> Screen.DRIVER_GRAPH
+    Constants.ROLE_ADMIN  -> Screen.ADMIN_GRAPH
+    else                  -> Screen.BUYER_GRAPH
 }
 
 @Composable
