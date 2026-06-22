@@ -13,3 +13,7 @@
 .externalNativeBuild
 .cxx
 local.properties
+/.idea/planningMode.xml
+/.idea/discord.xml
+/.idea/deploymentTargetSelector.xml
+**/.DS_Store
