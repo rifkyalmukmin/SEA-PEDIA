@@ -31,9 +31,14 @@ fun NavGraph(navController: NavHostController) {
         ) {
             composable(Screen.Splash.route) {
                 SplashScreen(
-                    onNavigateToLogin = {
+                    onNavigateToAuth = {
                         navController.navigate(Screen.Login.route) {
                             popUpTo(Screen.Splash.route) { inclusive = true }
+                        }
+                    },
+                    onNavigateToRole = { role ->
+                        navController.navigate(roleToGraph(role)) {
+                            popUpTo(Screen.AUTH_GRAPH) { inclusive = true }
                         }
                     }
                 )
