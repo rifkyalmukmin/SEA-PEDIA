@@ -8,10 +8,16 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
+import androidx.navigation.navArgument
 import com.example.seapedia.core.utils.Constants
+import com.example.seapedia.presentation.ProductDetailScreen
+import com.example.seapedia.presentation.ProductListScreen
+import com.example.seapedia.presentation.ProfileScreen
+import com.example.seapedia.presentation.ReviewScreen
 import com.example.seapedia.presentation.auth.login.LoginScreen
 import com.example.seapedia.presentation.auth.register.RegisterScreen
 import com.example.seapedia.presentation.home.HomeScreen
@@ -76,13 +82,43 @@ fun NavGraph(navController: NavHostController) {
             route = Screen.BUYER_GRAPH
         ) {
             composable(Screen.Buyer.Home.route) { HomeScreen() }
+            composable(Screen.ProductList.route) {
+                ProductListScreen(
+                    onProductClick = { id ->
+                        navController.navigate(Screen.ProductDetail.createRoute(id))
+                    },
+                    onBack = { navController.popBackStack() }
+                )
+            }
+            composable(
+                route = Screen.ProductDetail.route,
+                arguments = listOf(navArgument("productId") { type = NavType.StringType })
+            ) { backStackEntry ->
+                val productId = backStackEntry.arguments?.getString("productId").orEmpty()
+                ProductDetailScreen(
+                    productId = productId,
+                    isGuest = false,
+                    onBack = { navController.popBackStack() },
+                    onRequireLogin = {
+                        navController.navigate(Screen.Login.route)
+                    }
+                )
+            }
+            composable(Screen.AppReview.route) {
+                ReviewScreen(onBack = { navController.popBackStack() })
+            }
+            composable(Screen.Profile.route) {
+                ProfileScreen(onLogout = {
+                    navController.navigate(Screen.AUTH_GRAPH) {
+                        popUpTo(Screen.BUYER_GRAPH) { inclusive = true }
+                    }
+                })
+            }
             composable(Screen.Buyer.Cart.route) { PlaceholderScreen("Keranjang") }
             composable(Screen.Buyer.Checkout.route) { PlaceholderScreen("Checkout") }
             composable(Screen.Buyer.Order.route) { PlaceholderScreen("Pesanan Saya") }
             composable(Screen.Buyer.Address.route) { PlaceholderScreen("Alamat Pengiriman") }
             composable(Screen.Buyer.Wallet.route) { PlaceholderScreen("Dompet") }
-            composable(Screen.ProductDetail.route) { PlaceholderScreen("Detail Produk") }
-            composable(Screen.Profile.route) { PlaceholderScreen("Profil") }
         }
 
         // ── Seller graph ───────────────────────────────────────────────────

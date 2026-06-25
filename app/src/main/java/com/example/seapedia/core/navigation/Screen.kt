@@ -10,6 +10,8 @@ sealed class Screen(val route: String) {
 
     // ── Shared ───────────────────────────────────────────────────────────────
     object Profile : Screen("profile")
+    object ProductList : Screen("product_list")
+    object AppReview : Screen("app_review")
 
     object ProductDetail : Screen("product_detail/{productId}") {
         fun createRoute(productId: String) = "product_detail/$productId"
@@ -48,7 +50,7 @@ sealed class Screen(val route: String) {
     // ── Admin ────────────────────────────────────────────────────────────────
     sealed class Admin(route: String) : Screen(route) {
         object Dashboard  : Admin("admin_dashboard")
-        object Monitoring : Admin("admin_monitoring")
+        object pushMonitoring : Admin("admin_monitoring")
         object Overdue    : Admin("admin_overdue")
         object Promo      : Admin("admin_promo")
         object Voucher    : Admin("admin_voucher")
