@@ -31,22 +31,50 @@ class ProductListViewModel : ViewModel() {
     private fun loadProducts() {
         viewModelScope.launch {
             try {
-                val response = apiService.getProducts()
+                _uiState.update { it.copy(isLoading = true, error = null) }
+                val response = apiService.getProducts().execute()
+
                 if (response.isSuccessful) {
                     response.body()?.let { productResponse ->
                         if (productResponse.success) {
-                            _uiState.update { it.copy(products = productResponse.data, error = null) }
+                            _uiState.update {
+                                it.copy(
+                                    products = productResponse.data,
+                                    isLoading = false,
+                                    error = null
+                                )
+                            }
                         } else {
-                            _uiState.update { it.copy(error = "Failed to load products") }
+                            _uiState.update {
+                                it.copy(
+                                    isLoading = false,
+                                    error = "Failed to load products: Unknown error"
+                                )
+                            }
                         }
                     } ?: run {
-                        _uiState.update { it.copy(error = "Invalid response from server") }
+                        _uiState.update {
+                            it.copy(
+                                isLoading = false,
+                                error = "Invalid response from server"
+                            )
+                        }
                     }
                 } else {
-                    _uiState.update { it.copy(error = "Server error: ${response.code()}") }
+                    _uiState.update {
+                        it.copy(
+                            isLoading = false,
+                            error = "Server error: ${response.code()} ${response.message()}"
+                        )
+                    }
                 }
             } catch (e: Exception) {
-                _uiState.update { it.copy(error = "Network error: ${e.message}") }
+                _uiState.update {
+                    it.copy(
+                        isLoading = false,
+                        error = "Network error: ${e.localizedMessage ?: e.toString()}"
+                    )
+                }
             }
         }
     }
