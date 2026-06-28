@@ -2,14 +2,13 @@ const express = require('express');
 const router = express.Router();
 const { authenticate } = require('../middleware/authMiddleware');
 const { authorizeRoles } = require('../middleware/roleMiddleware');
-const {
-  getProductReviews,
-  createReview,
-  deleteReview,
-} = require('../controllers/reviewController');
+const { validate } = require('../middleware/validationMiddleware');
+const { validateCreateReview } = require('../validators/reviewValidator');
+const { listReviews, createReview, deleteReview } = require('../controllers/reviewController');
 
-router.get('/products/:productId', getProductReviews);
-router.post('/', authenticate, authorizeRoles('buyer'), createReview);
-router.delete('/:id', authenticate, authorizeRoles('buyer', 'admin'), deleteReview);
+// Ulasan APLIKASI (publik) — Level 1.
+router.get('/', listReviews);                                   // publik
+router.post('/', validateCreateReview, validate, createReview); // guest boleh (tanpa auth)
+router.delete('/:id', authenticate, authorizeRoles('admin'), deleteReview); // hapus: admin
 
 module.exports = router;

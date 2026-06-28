@@ -1,6 +1,9 @@
-package com.example.seapedia.data.remote
+package com.example.seapedia.core.network
 
+import com.example.seapedia.domain.AppReview
+import com.example.seapedia.domain.Product
 import com.example.seapedia.domain.User
+import okhttp3.ResponseBody
 import retrofit2.Call
 import retrofit2.http.Body
 import retrofit2.http.DELETE
@@ -13,11 +16,7 @@ import retrofit2.http.Query
 import retrofit2.http.Multipart
 import retrofit2.http.PartMap
 
-/**
- * Retrofit interface for SeaPedia API endpoints
- * Matches the backend endpoints in backend seapedia/
- */
-interface SeaPediaApi {
+interface ApiService {
 
     // Authentication endpoints
     @POST("/api/auth/register")
@@ -59,7 +58,7 @@ interface SeaPediaApi {
     fun updateProduct(@Path("id") id: String, @Body product: Product): Call<Product>
 
     @DELETE("/api/seller/products/{id}")
-    fun deleteProduct(@Path("id") id: String): Call<Void>
+    fun deleteProduct(@Path("id") id: String): Call<ResponseBody>
 
     // Review endpoints
     @GET("/api/reviews")
@@ -69,7 +68,7 @@ interface SeaPediaApi {
     fun createReview(@Body review: AppReview): Call<AppReview>
 
     @DELETE("/api/reviews/{id}")
-    fun deleteReview(@Path("id") id: String): Call<Void>
+    fun deleteReview(@Path("id") id: String): Call<ResponseBody>
 
     // Seller endpoints
     @GET("/api/seller/store")
@@ -104,7 +103,7 @@ interface SeaPediaApi {
     fun updateAddress(@Path("id") id: String, @Body address: Address): Call<Address>
 
     @DELETE("/api/buyer/address/{id}")
-    fun deleteAddress(@Path("id") id: String): Call<Void>
+    fun deleteAddress(@Path("id") id: String): Call<ResponseBody>
 
     @GET("/api/buyer/cart")
     fun getCart(): Call<Cart>
@@ -129,7 +128,7 @@ interface SeaPediaApi {
 
     // Driver endpoints
     @GET("/api/driver/jobs")
-    fun getAvailableJobs(): Call<List<Job>>
+    func getAvailableJobs(): Call<List<Job>>
 
     @POST("/api/driver/jobs/{id}/take")
     fun takeJob(@Path("id") id: String): Call<Job>
@@ -166,7 +165,7 @@ interface SeaPediaApi {
     fun getPromos(): Call<List<Promo>>
 
     @POST("/api/admin/simulate-next-day")
-    fun simulateNextDay(): Call<Void>
+    fun simulateNextDay(): Call<ResponseBody>
 }
 
 // Data classes for API responses
@@ -297,8 +296,8 @@ data class AdminMonitoring(
     val stores: List<AdminStore> = emptyList(),
     val products: List<AdminProduct> = emptyList(),
     val orders: List<AdminOrder> = emptyList(),
-    val vouchers: List<AdminVoucher> = emptyList(),
-    val promos: List<AdminPromo> = emptyList()
+    vouchers: List<AdminVoucher> = emptyList(),
+    promos: List<AdminPromo> = emptyList()
 )
 
 data class AdminUser(
@@ -365,4 +364,64 @@ data class Promo(
     val code: String = "",
     val discountPercent: Int = 0,
     val expiryDate: String = ""
+)
+
+data class AdminDashboardResponse(
+    val success: Boolean = true,
+    val data: AdminDashboard = AdminDashboard()
+)
+
+data class AdminMonitoringResponse(
+    val success: Boolean = true,
+    val data: AdminMonitoring = AdminMonitoring()
+)
+
+data class VoucherResponse(
+    val success: Boolean = true,
+    val data: Voucher = Voucher()
+)
+
+data class PromoResponse(
+    val success: Boolean = true,
+    val data: Promo = Promo()
+)
+
+data class EarningsResponse(
+    val success: Boolean = true,
+    val data: Earnings = Earnings()
+)
+
+data class JobResponse(
+    val success: Boolean = true,
+    val data: Job = Job()
+)
+
+data class OrderResponse(
+    val success: Boolean = true,
+    val data: Order = Order()
+)
+
+data class WalletResponse(
+    val success: Boolean = true,
+    val data: Wallet = Wallet()
+)
+
+data class AddressResponse(
+    val success: Boolean = true,
+    val data: Address = Address()
+)
+
+data class CartResponse(
+    val success: Boolean = true,
+    val data: Cart = Cart()
+)
+
+data class StoreResponse(
+    val success: Boolean = true,
+    val data: Store = Store()
+)
+
+data class ProductListResponse(
+    val success: Boolean = true,
+    val data: List<Product> = emptyList()
 )

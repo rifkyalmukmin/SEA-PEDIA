@@ -12,4 +12,15 @@ const successResponse = (res, data, statusCode = 200) =>
 const errorResponse = (res, message, statusCode = 400) =>
   res.status(statusCode).json({ success: false, message });
 
-module.exports = { formatCurrency, paginate, successResponse, errorResponse };
+// Casing role: DB menyimpan UPPERCASE (ENUM), API memakai lowercase.
+const toDbRole = (role) => (role == null ? null : String(role).toUpperCase());
+const toApiRole = (role) => (role == null ? null : String(role).toLowerCase());
+
+module.exports = {
+  formatCurrency,
+  paginate,
+  successResponse,
+  errorResponse,
+  toDbRole,
+  toApiRole,
+};

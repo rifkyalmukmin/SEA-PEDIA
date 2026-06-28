@@ -43,14 +43,14 @@ sealed class Screen(val route: String) {
     sealed class Driver(route: String) : Screen(route) {
         object Jobs      : Driver("driver_jobs")
         object ActiveJob : Driver("driver_active_job")
-        object History   : Driver("driver_history")
+    object History   : Driver("driver_history")
         object Earning   : Driver("driver_earning")
     }
 
     // ── Admin ────────────────────────────────────────────────────────────────
     sealed class Admin(route: String) : Screen(route) {
         object Dashboard  : Admin("admin_dashboard")
-        object pushMonitoring : Admin("admin_monitoring")
+        object Monitoring : Admin("admin_monitoring")
         object Overdue    : Admin("admin_overdue")
         object Promo      : Admin("admin_promo")
         object Voucher    : Admin("admin_voucher")

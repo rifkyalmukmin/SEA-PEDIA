@@ -13,7 +13,8 @@ const Role = {
   },
 
   async findByName(name) {
-    const { rows } = await db.query('SELECT * FROM roles WHERE name = $1', [name]);
+    // Terima lowercase ('buyer') maupun uppercase ('BUYER'); DB simpan UPPERCASE.
+    const { rows } = await db.query('SELECT * FROM roles WHERE name = UPPER($1)', [name]);
     return rows[0] || null;
   },
 };
